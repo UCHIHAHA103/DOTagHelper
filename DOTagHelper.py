@@ -2860,7 +2860,8 @@ ageM: <= 7 d = modified last 7 days</div>
             if(!configData.orderType) configData.orderType = [...defaultTypeOrder];
             if(!configData.orderRating) configData.orderRating = [...defaultRatingOrder];
             
-            setTimeout(() => {
+            // 等待 pywebview API 就绪后再初始化 UI
+            function doInit() {
                 try {
                     initColorPicker(); initExpandedState(currentTree(), ""); renderWsBar(); renderActionBtnColors(); initCompModule(); render();
                     initResizeObserver();
@@ -2877,13 +2878,27 @@ ageM: <= 7 d = modified last 7 days</div>
                     initColorPicker(); initExpandedState(currentTree(), ""); renderWsBar(); renderActionBtnColors(); initCompModule(); render();
                 } catch(e) {
                     console.error('[DOTagHelper] Init error:', e);
-                    sysLog('Init error: ' + e.message, 'ERROR');
+                    try { sysLog('Init error: ' + e.message, 'ERROR'); } catch(e2) {}
                 }
                 // 无论初始化是否成功，都隐藏 loading 界面
                 document.querySelector('.main-content').classList.add('ready');
                 document.getElementById('app-loader').style.opacity = '0';
                 setTimeout(() => document.getElementById('app-loader').style.display = 'none', 400);
-            }, 50);
+            }
+            
+            // pywebview API 可能尚未注入（尤其从文件 URL 加载时），需等待 pywebviewready 事件
+            if (window.pywebview && window.pywebview.api && typeof window.pywebview.api.log_message === 'function') {
+                setTimeout(doInit, 50);
+            } else {
+                window.addEventListener('pywebviewready', () => setTimeout(doInit, 50));
+                // 安全超时：即使 pywebview API 始终没加载，也强制初始化 UI（4秒后）
+                setTimeout(() => {
+                    if (!document.querySelector('.main-content.ready')) {
+                        console.warn('[DOTagHelper] pywebview API not ready after 4s, forcing init...');
+                        doInit();
+                    }
+                }, 4000);
+            }
             
             window.addEventListener('resize', () => setTimeout(updateWsVisibility, 100));
         });
@@ -5747,6 +5762,10 @@ ageM: <= 7 d = modified last 7 days</div>
 """
 
 if __name__ == '__main__':
+    import tempfile
+    
+    write_log("=== DOTagHelper Starting ===", "INFO")
+    
     initial_data = json.dumps(load_tags(), ensure_ascii=False)
     
     cfg = load_config()
@@ -5769,17 +5788,43 @@ if __name__ == '__main__':
     curr_ver = WINDOW_TITLE.split(' ')[-1]
     html_str = html_template.replace("/*__INIT_DATA__*/{}", initial_data).replace("/*__INIT_CONFIG__*/{}", initial_config).replace("/*__INIT_VERSION__*/", curr_ver)
     
-    window = webview.create_window(
-        WINDOW_TITLE, 
-        html=html_str, # 使用替换后的 html_str
-        js_api=api, 
-        width=w_width, 
-        height=w_height,
-        x=w_x,
-        y=w_y,
-        min_size=(450, 500),
-        background_color=startup_bg_color
-    )
+    # === 关键修复：将 HTML 写入临时文件并通过 file:// URL 加载 ===
+    # pywebview 使用 NavigateToString 加载内联 HTML 在 PyInstaller 打包后可能出现
+    # WebView2 初始化时序问题导致白屏/LOADING 卡住，改用文件加载最稳定
+    _html_file = os.path.join(DATA_DIR, "_app.html")
+    try:
+        with open(_html_file, "w", encoding="utf-8") as f:
+            f.write(html_str)
+        _html_url = "file:///" + _html_file.replace("\\", "/")
+        write_log(f"HTML written to: {_html_file}", "INFO")
+    except Exception as e:
+        write_log(f"Failed to write HTML file: {e}, falling back to inline html", "ERROR")
+        _html_url = None
+    
+    if _html_url:
+        window = webview.create_window(
+            WINDOW_TITLE, 
+            url=_html_url,
+            js_api=api, 
+            width=w_width, 
+            height=w_height,
+            x=w_x,
+            y=w_y,
+            min_size=(450, 500),
+            background_color=startup_bg_color
+        )
+    else:
+        window = webview.create_window(
+            WINDOW_TITLE, 
+            html=html_str,
+            js_api=api, 
+            width=w_width, 
+            height=w_height,
+            x=w_x,
+            y=w_y,
+            min_size=(450, 500),
+            background_color=startup_bg_color
+        )
     
     def on_shown():
         try:
@@ -5841,7 +5886,16 @@ if __name__ == '__main__':
         
     window.events.closing += on_closing
 
+    write_log("Starting webview...", "INFO")
     webview.start()
+    write_log("Webview closed.", "INFO")
+    
+    # 清理临时 HTML 文件
+    try:
+        if os.path.exists(_html_file):
+            os.remove(_html_file)
+    except:
+        pass
 
 
 
