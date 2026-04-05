@@ -4246,7 +4246,6 @@ ageM: <= 7 d = modified last 7 days</div>
                     includeTags.push({tag: formattedTag, mode: stateVal}); // 1=AND(;), 3=OR(,)
                     actualTagsCount++;
                 }
-                }
             });
             
             let typeArr = []; let hasFolder = false; let hasNotFolder = false;
