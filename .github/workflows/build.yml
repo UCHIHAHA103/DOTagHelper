@@ -1,0 +1,58 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main ]
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install pyinstaller
+
+      - name: Build with PyInstaller
+        run: |
+          pyinstaller --noconfirm --onedir --windowed `
+            --name "DOTagHelper" `
+            --icon "logo.ico" `
+            --add-data "Data;Data" `
+            --add-data "Docs;Docs" `
+            --add-data "Workspace;Workspace" `
+            --add-data "logo.ico;." `
+            DOTagHelper.py
+
+      - name: Prepare release archive
+        run: |
+          $version = (Select-String -Path DOTagHelper.py -Pattern "WINDOW_TITLE\s*=\s*'DOTagHelper\s+([\d.]+)'" | ForEach-Object { $_.Matches.Groups[1].Value })
+          if (-not $version) { $version = "dev" }
+          echo "VERSION=$version" >> $env:GITHUB_ENV
+          Compress-Archive -Path "dist\DOTagHelper\*" -DestinationPath "DOTagHelper_$version.zip"
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: DOTagHelper_${{ env.VERSION }}
+          path: dist/DOTagHelper/
+
+      - name: Create Release (on tag push)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: DOTagHelper_${{ env.VERSION }}.zip
+          generate_release_notes: true

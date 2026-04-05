@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XYplorerTagHelper User Guide</title>
+    <title>DOTagHelper User Guide</title>
     <style>
         :root {
             --bg-color: #f5f5f7;
@@ -295,15 +295,15 @@
     </nav>
 
     <main class="content">
-        <h1>XYplorerTagHelper User Guide</h1>
+        <h1>DOTagHelper User Guide</h1>
         
-        <p class="intro-text"><a href="https://github.com/C21H21NO2S/XYplorerTagHelper"><strong>XYplorerTagHelper</strong></a> appears to be an open-source tagging assistant on GitHub, but it is actually a <strong>full-featured Visual Search Builder for XYplorer</strong>. It translates complex file types, paths, comments, and multi-tag logic into intuitive "point, click, and drag" operations, compiling them in real-time into XYplorer's advanced search syntax.</p>
+        <p class="intro-text"><a href="https://github.com/C21H21NO2S/DOTagHelper"><strong>DOTagHelper</strong></a> appears to be an open-source tagging assistant on GitHub, but it is actually a <strong>full-featured Visual Search Builder for Directory Opus</strong>. It translates complex file types, paths, comments, and multi-tag logic into intuitive "point, click, and drag" operations, compiling them in real-time into Directory Opus's advanced search syntax.</p>
 
         <h2 id="sec-1">🏗️ I. Software Architecture & Underlying Logic</h2>
         <ul>
             <li><strong>Technical Architecture:</strong> Adopts a lightweight <code>pywebview</code> architecture. The frontend is a modern UI built with pure HTML/CSS/JS (supporting smooth dark/light dual themes), while the backend is Python. It has zero dependency on large third-party frameworks, ensuring extremely fast startup and low memory usage.</li>
             <li><strong>State Machine Logic:</strong> Every click (left/right), input, and drag is stored in a global state tree. The engine parses this tree in real-time to compile boolean search syntax, such as <code>tags:A &amp; !B /types={:Image}</code>.</li>
-            <li><strong>Communication & Execution:</strong> The compiled syntax is silently sent via Python to <code>XYplorer.exe</code> as a command line execution (<code>/feed="::goto..."</code>). Reading and writing tags are achieved through two-way communication using internal scripts and the system clipboard.</li>
+            <li><strong>Communication & Execution:</strong> The compiled syntax is silently sent via Python to <code>Directory Opus</code> as a command line execution (<code>dopusrt /cmd ...</code>). Reading and writing tags are achieved through the <code>dopusrt /cmd SetAttr META</code> command.</li>
         </ul>
 
         <hr>
@@ -314,7 +314,7 @@
         <h3 id="sec-2-1">1. Basic Settings</h3>
         <ul>
             <li>Click the <strong>"⚙️ (Gear)"</strong> icon in the top right corner of the interface to enter system settings.</li>
-            <li><strong>XYplorer Path:</strong> You must accurately enter the path to XYplorer (either the <code>.exe</code> file path or its folder); otherwise, search commands cannot be sent.</li>
+            <li><strong>Directory Opus Path:</strong> You must accurately enter the path to Directory Opus (either the <code>dopusrt.exe</code> file path or its folder); otherwise, search commands cannot be sent.</li>
             <li><strong>UI Language & Theme:</strong> Supports seamless switching between English/Simplified Chinese/Traditional Chinese and light/dark themes.</li>
         </ul>
 
@@ -333,17 +333,17 @@
         <hr>
 
         <h2 id="sec-3">🎛️ III. Four Core Action Buttons (Top Action Buttons)</h2>
-        <p>The four large buttons at the top of the interface are the "execution engine" of the tool. They translate the visual state you built in the modern UI panel below into actual commands that XYplorer understands.</p>
+        <p>The four large buttons at the top of the interface are the "execution engine" of the tool. They translate the visual state you built in the modern UI panel below into actual commands that Directory Opus understands.</p>
 
         <h3 id="sec-3-1">1. <strong>🔍 Search</strong></h3>
         <ul>
-            <li><strong>Function:</strong> Automatically compiles all active filter conditions on the panel (including file types, custom extensions, paths, advanced composite tags, etc.) into XYplorer's advanced search syntax, and dispatches it to execute a full-disk or specific-directory search.</li>
+            <li><strong>Function:</strong> Automatically compiles all active filter conditions on the panel (including file types, custom extensions, paths, advanced composite tags, etc.) into Directory Opus's advanced search syntax (FILTERDEF), and dispatches it to execute a full-disk or specific-directory search.</li>
             <li><strong>Note:</strong> The search logic strictly follows your click states on the panel: Left-click (Green) means include/OR, Right-click (Red) means exclude/NOT. After every successful search, the system automatically saves your inputted path, name, and comments into the history dropdown menus.</li>
         </ul>
 
         <h3 id="sec-3-2">2. <strong>🏷️ Tag / Untag</strong></h3>
         <ul>
-            <li><strong>Function:</strong> Batch modify tags of the currently selected files in XYplorer. <strong>Supports simultaneously completing "adding new tags" and "precisely erasing old tags" in a single click.</strong></li>
+            <li><strong>Function:</strong> Batch modify tags of the currently selected files in Directory Opus. <strong>Supports simultaneously completing "adding new tags" and "precisely erasing old tags" in a single click.</strong></li>
             <li><strong>Core Operation Logic:</strong>
                 <ul>
                     <li><strong>Left-click Highlight (Blue 🔵):</strong> Marked for <strong>Addition</strong>. This tag will be written to the selected files.</li>
@@ -353,21 +353,21 @@
             <li><strong>Note:</strong> 
                 <ul>
                     <li>The underlying engine intelligently prioritizes "Remove" commands before executing "Add" commands.</li>
-                    <li>Before clicking, <strong>you must ensure XYplorer is the active window and at least one file is selected</strong>. If no files are selected, or if there are no active Blue/Red tags on the interface (e.g., only Green 🟢 highlighted by middle-click), the system will block the operation and pop up an error prompt.</li>
+                    <li>Before clicking, <strong>you must ensure Directory Opus is the active window and at least one file is selected</strong>. If no files are selected, or if there are no active Blue/Red tags on the interface (e.g., only Green 🟢 highlighted by middle-click), the system will block the operation and pop up an error prompt.</li>
                 </ul>
             </li>
         </ul>
 
         <h3 id="sec-3-3">3. <strong>📖 Read Tags</strong></h3>
         <ul>
-            <li><strong>Function:</strong> Extracts existing tags from the currently selected file in XYplorer, and automatically highlights, categorizes, and expands the corresponding tag tree hierarchy in the helper panel.</li>
+            <li><strong>Function:</strong> Extracts existing tags from the currently selected file in Directory Opus, and automatically highlights, categorizes, and expands the corresponding tag tree hierarchy in the helper panel.</li>
             <li><strong>Note:</strong> This function uses the system clipboard for data transfer. If the read tag text is extremely large (e.g., over 500 characters or containing multiple lines of abnormal text), the system will pop up a safety confirmation window to prevent massive erroneous activations, allowing you to preview and manually confirm before writing to the UI.</li>
         </ul>
 
         <h3 id="sec-3-4">4. <strong>🗑️ Clear</strong></h3>
         <ul>
             <li><strong>Function:</strong> One-click state reset. Instantly clears all highlight states (Green, Red, Blue) in the composite filter area and tag tree, empties all text input boxes, and restores the workspace to its initial standby state.</li>
-            <li><strong>Note:</strong> This operation only clears the <strong>search filter conditions on the current interface</strong>; it will absolutely NOT delete any of your group names, tag configurations, or workspace history data, nor will it affect the real file tags in XYplorer.</li>
+            <li><strong>Note:</strong> This operation only clears the <strong>search filter conditions on the current interface</strong>; it will absolutely NOT delete any of your group names, tag configurations, or workspace history data, nor will it affect the real file tags in Directory Opus.</li>
         </ul>
 
         <hr>
@@ -386,7 +386,7 @@
         <p>The composite area panels highly support customization:</p>
         <ul>
             <li><strong>Types and Extensions Sorting:</strong> Click and hold preset type buttons like "Text", "Image", or your own custom extension buttons, and <strong>drag left/right</strong> to adjust their arrangement order on the interface.</li>
-            <li><strong>Labels Sorting:</strong> After clicking "Sync XYplorer Labels" to fetch configurations, it also supports left/right dragging to rearrange the order of label colors.</li>
+            <li><strong>Labels Sorting:</strong> After clicking "Sync Directory Opus Labels" to fetch configurations, it also supports left/right dragging to rearrange the order of label colors.</li>
         </ul>
 
         <h3 id="sec-4-3">3. Deep Editing of Custom Extensions</h3>
@@ -403,7 +403,7 @@
 
         <h3 id="sec-4-4">4. Smart Text Input</h3>
         <ul>
-            <li><strong>Path/Name/Comment:</strong> Supports smart composite logic. Typing <code>A+B,C-D</code> in the input box will automatically be converted by the engine into strict XYplorer syntax: <code>(A AND B) OR (C AND NOT D)</code>.</li>
+            <li><strong>Path/Name/Comment:</strong> Supports smart composite logic. Typing <code>A+B,C-D</code> in the input box will automatically be converted by the engine into strict Directory Opus FILTERDEF syntax: <code>(A AND B) OR (C AND NOT D)</code>.</li>
         </ul>
 
         <hr>
@@ -460,7 +460,7 @@
 
         <h2 id="sec-6">⚠️ VI. Core Operation Precautions</h2>
         <ol>
-            <li><strong>Prerequisite for Tagging:</strong> Before using the "Tag" function, please ensure XYplorer is active and <strong>at least one file is selected</strong>. If no file is selected, XYplorer will ignore the tag command.</li>
+            <li><strong>Prerequisite for Tagging:</strong> Before using the "Tag" function, please ensure Directory Opus is active and <strong>at least one file is selected</strong>. If no file is selected, Directory Opus will ignore the tag command.</li>
             <li><strong>Clipboard Limits for Reading Tags:</strong> The "Read Tags" function works by copying the file's tags to the clipboard. If a huge number of files are read at once and the tags are extremely complex (over 500 characters), the software will pop up a "Batch Confirmation Window" to prevent misoperation, allowing you to manually confirm the read tag details before executing activation.</li>
             <li><strong>System Data Security:</strong> All configurations and tag data are saved in <code>.json</code> format in the <code>Data</code> folder of the software directory. Although the software has a built-in debounce auto-save mechanism, it is recommended to use <strong>"Export Workspace Data"</strong> in "⚙️ Settings" for manual backup before performing large-scale structural rearrangements (large-scale drag-and-drop, batch renaming).</li>
         </ol>

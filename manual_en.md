@@ -1,4 +1,4 @@
-# XYplorerTagHelper User Guide
+# DOTagHelper User Guide
 
 ## Table of Contents
 
@@ -27,13 +27,13 @@
 
 ------
 
-**[XYplorerTagHelper](https://github.com/C21H21NO2S/XYplorerTagHelper)** is ostensibly an open-source tag helper tool on GitHub, but in reality, it is a **full-featured Visual Search Builder for XYplorer**. It transforms complex file types, paths, remarks, and multiple tag logics into intuitive "point-and-click and drag-and-drop" actions, compiling them in real-time into XYplorer's advanced search syntax.
+**[DOTagHelper](https://github.com/C21H21NO2S/DOTagHelper)** is ostensibly an open-source tag helper tool on GitHub, but in reality, it is a **full-featured Visual Search Builder for Directory Opus**. It transforms complex file types, paths, remarks, and multiple tag logics into intuitive "point-and-click and drag-and-drop" actions, compiling them in real-time into Directory Opus's advanced search syntax.
 
 ## 🏗️ I. Software Architecture and Underlying Logic
 
 - **Technical Architecture:** Built on a lightweight `pywebview` architecture. The front end is a modern UI constructed purely with HTML/CSS/JS (supporting smooth dark/light dual themes), and the back end is Python. It has no heavy third-party framework dependencies throughout, ensuring extremely fast startup times and low memory usage.
-- **State Machine Logic:** Every click (left/right), input, or drag you perform is stored in a global state tree. The engine parses this tree in real-time to compile boolean search syntax such as `tags:A & !B /types={:Image}`.
-- **Communication Execution:** The compiled syntax is silently sent to `XYplorer.exe` via Python as a command line argument (`/feed="::goto..."`) for execution. The tag reading and writing functionality achieves two-way communication by invoking internal scripts and the system clipboard.
+- **State Machine Logic:** Every click (left/right), input, or drag you perform is stored in a global state tree. The engine parses this tree in real-time to compile boolean search syntax such as `tags match *A* AND tags nomatch *B*`.
+- **Communication Execution:** The compiled syntax is silently sent to `Directory Opus` via Python as a command line argument (`dopusrt /cmd ...`) for execution. The tag reading and writing functionality achieves two-way communication through the `dopusrt /cmd SetAttr META` command.
 
 ------
 
@@ -44,14 +44,14 @@ The software supports multi-workspace management. Data, tag tree structures, and
 ## 1. Basic Settings
 
 - Click the **"⚙️ (Gear)"** icon in the top right corner of the interface to enter system settings.
-- **XYplorer Path:** You must accurately fill in the path to XYplorer (can be the `.exe` file path or the folder it resides in), otherwise search commands cannot be sent.
+- **Directory Opus Path:** You must accurately fill in the path to Directory Opus (can be the `dopusrt.exe` file path or the folder it resides in), otherwise search commands cannot be sent.
 - **UI Language and Theme:** Supports seamless switching between Simplified Chinese / English / Traditional Chinese and Light / Dark themes.
 
 ## 2. Advanced Workspace Operations
 
 - **Drag and Drop Sorting:** The workspace tabs at the top support directly holding the **left mouse button and dragging left or right** to adjust the tab order as you please.
 - **Rename Workspace:** After triggering a rename, the name on the top workspace tab will synchronize and update immediately without requiring a reload.
-- **Workspace Import/Export:** **Right-click** on the "+" button at the far right of the tag group button bar to access the newly added "Export Current Workspace" and "Import to Current Workspace" features. Official presets or AI batch-generated tag group data can be quickly imported using this feature. *(Official preset tag groups download: [Workspace Presets](https://github.com/C21H21NO2S/XYplorerTagHelper/tree/main/Workspace))*。
+- **Workspace Import/Export:** **Right-click** on the "+" button at the far right of the tag group button bar to access the newly added "Export Current Workspace" and "Import to Current Workspace" features. Official presets or AI batch-generated tag group data can be quickly imported using this feature. *(Official preset tag groups download: [Workspace Presets](https://github.com/C21H21NO2S/DOTagHelper/tree/main/Workspace))*.
 - **Context Menu (Core):** **Right-click** on any workspace tab to bring up the advanced menu:
   - **Change Tab Color:** Set a dedicated theme color block for different workspaces to facilitate visual isolation.
   - **Rename / Delete:** Deleting will prompt a confirmation to prevent accidental touches. Note: The system strictly requires at least one workspace to be kept.
@@ -61,16 +61,16 @@ The software supports multi-workspace management. Data, tag tree structures, and
 
 ## 🎛️ III. Four Core Action Buttons (Top Action Buttons)
 
-The four large buttons located at the top of the interface are the "execution engine" of the entire tool. They are responsible for translating the visual states you build in the modern UI panel below into actual commands that XYplorer can understand.
+The four large buttons located at the top of the interface are the "execution engine" of the entire tool. They are responsible for translating the visual states you build in the modern UI panel below into actual commands that Directory Opus can understand.
 
 ## 1. **🔍 Search**
 
-- **Function:** Automatically compiles all active filter conditions on the panel into XYplorer's advanced search syntax and dispatches it for execution.
+- **Function:** Automatically compiles all active filter conditions on the panel into Directory Opus's advanced search syntax (FILTERDEF) and dispatches it for execution.
 - **Precautions:** Search logic strictly follows your click states on the panel: Left click (Green) represents inclusion or OR, and Right click (Red) represents exclusion (NOT).
 
 ## 2. **🏷️ Apply Tag / Remove Tag (Tag)**
 
-- **Function:** Batch modifies the tags of the currently selected files in XYplorer. **Supports completing both "adding new tags" and "precisely erasing old tags" simultaneously in a single click**.
+- **Function:** Batch modifies the tags of the currently selected files in Directory Opus. **Supports completing both "adding new tags" and "precisely erasing old tags" simultaneously in a single click**.
 - **Core Operation Logic:**
   - **Left Click Highlight (Blue 🔵):** Marked for **Addition**. This tag will be written to the selected files.
   - **Right Click Highlight (Red 🔴):** Marked for **Removal**. If the selected files currently contain this tag, it will be precisely erased.
@@ -81,11 +81,11 @@ The four large buttons located at the top of the interface are the "execution en
   - AI Filename auto-generate tags - En/Zh (Active).
   - AI Filename auto-generate tags (Active).
   - AI Text content auto-generate tags (Active).
-- **Precautions:** You must ensure that XYplorer is the active window and that at least one file is selected.
+- **Precautions:** You must ensure that Directory Opus is the active window and that at least one file is selected.
 
 ## 3. **📖 Read Tags (Read)**
 
-- **Function:** Extracts the existing tags of the currently selected files in XYplorer, and automatically highlights, categorizes, and expands the corresponding tag tree hierarchy in the helper panel.
+- **Function:** Extracts the existing tags of the currently selected files in Directory Opus, and automatically highlights, categorizes, and expands the corresponding tag tree hierarchy in the helper panel.
 
 ## 4. **🗑️ Clear**
 
@@ -105,7 +105,7 @@ This is the core area for building filter conditions such as file types, paths, 
 ## 2. Drag and Drop Sorting (Free UI Customization)
 
 - **Type and Extension Sorting:** Hold down preset type buttons or custom extension buttons, and **drag left or right** to adjust their display order.
-- **Labels Sorting:** After syncing XYplorer labels, you can also drag left or right to rearrange the order of label colors.
+- **Labels Sorting:** After syncing Directory Opus labels, you can also drag left or right to rearrange the order of label colors.
 
 ## 3. Deep Editing of Custom Extensions
 
@@ -114,7 +114,7 @@ This is the core area for building filter conditions such as file types, paths, 
 
 ## 4. Smart Text Input
 
-- **Path/Name/Remark:** Supports smart composite logic. Typing `A+B,C-D` in the input box will be automatically converted by the engine into strict XYplorer syntax: `(A and B) or (C and not D)`.
+- **Path/Name/Remark:** Supports smart composite logic. Typing `A+B,C-D` in the input box will be automatically converted by the engine into strict Directory Opus FILTERDEF syntax: `(A and B) or (C and not D)`.
 - **Syntax Improvements:** The latest version supports directly searching for tags containing the "&" symbol; the underlying layer has been deeply optimized to avoid conflicts with complex boolean logic symbols like AND/OR/NOT, &, |, and quotes (").
 
 ------
@@ -154,7 +154,7 @@ This is the core workflow area for managing tag categories, applying tags, and r
 
 ## ⚠️ VI. Core Operation Precautions
 
-1. **Prerequisite for Tagging:** Before using the "Apply Tag" function, please ensure XYplorer is the active window and **at least one file is selected**. If no file is selected, XYplorer will ignore the tag command.
+1. **Prerequisite for Tagging:** Before using the "Apply Tag" function, please ensure Directory Opus is the active window and **at least one file is selected**. If no file is selected, Directory Opus will ignore the tag command.
 2. **Clipboard Limitations for Reading Tags:** If reading a massive number of files at once with highly complex tags (exceeding 500 characters), the software will pop up a "Batch Confirmation Window" to prevent misoperation.
 3. **System Data Security:** All configuration and tag data are saved in `.json` format under the `Data` folder in the software directory. Before performing large-scale structural rearrangements, it is recommended to manually back up using "Export Workspace Data".
 
@@ -162,7 +162,7 @@ This is the core workflow area for managing tag categories, applying tags, and r
 
 ## 🤖 VII. Local AI Smart Tagging: Step-by-Step Configuration Guide
 
-By integrating a local Large Language Model (LLM), XYplorerTagHelper can automatically extract precise tags based on the "filename" or "file content" and automatically translate them into a language consistent with the software interface. The entire process runs **purely locally**, requires no internet connection, consumes zero API fees, and absolutely protects your file privacy!
+By integrating a local Large Language Model (LLM), DOTagHelper can automatically extract precise tags based on the "filename" or "file content" and automatically translate them into a language consistent with the software interface. The entire process runs **purely locally**, requires no internet connection, consumes zero API fees, and absolutely protects your file privacy!
 
 ## 💡 1. Model Recommendation Guide
 
@@ -192,9 +192,9 @@ By integrating a local Large Language Model (LLM), XYplorerTagHelper can automat
 2. Enter the command and press Enter to begin downloading (using the top recommended model as an example): `ollama run qwen2.5:3b`.
 3. When the download is complete, `>>>` will appear. You can type "Hello" to test it. Once the test is successful, simply close the black window (Ollama will serve silently in the background).
 
-**Step 3: Bind AI in XYplorerTagHelper**
+**Step 3: Bind AI in DOTagHelper**
 
-1. Open the `XYplorerTagHelper` software, and click the ⚙️ **Settings button** in the top right corner.
+1. Open the `DOTagHelper` software, and click the ⚙️ **Settings button** in the top right corner.
 2. Locate the **AI Module Settings** area:
    - **AI API URL (Ollama):** Change to `http://127.0.0.1:11434/api/generate` or `http://localhost:11434/api/generate`.
    - **AI Model Name:** Fill in the exact name you downloaded, for example: `qwen2.5:3b`.
@@ -202,8 +202,8 @@ By integrating a local Large Language Model (LLM), XYplorerTagHelper can automat
 
 ## 🎉 3. How to Use AI Smart Tagging?
 
-1. Select the files you need to tag in XYplorer (supports batch selecting multiple files).
-2. In `XYplorerTagHelper`, **right-click** the **"Tag"** button at the top.
+1. Select the files you need to tag in Directory Opus (supports batch selecting multiple files).
+2. In `DOTagHelper`, **right-click** the **"Tag"** button at the top.
 3. In the pop-up menu, select the AI-exclusive options with the orange icons:
    - 🧠 **AI Filename matches UCS Tags (No Active):** Strictly selects the most appropriate words from the left-side dictionary to apply to the file.
    - 🧠 **AI Filename auto-generate tags - En/Zh (Active):** AI freely extracts tags, provides bilingual remarks in English and Chinese, and automatically activates and categorizes them into the current tag group.

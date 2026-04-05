@@ -6,7 +6,7 @@
     "hist_name": [],
     "hist_remark": [],
     "customExts": [],
-    "xyPath": "C:\\XYplorer\\XYplorer.exe",
+    "doPath": "C:\\Program Files\\GPSoftware\\Directory Opus\\dopusrt.exe",
     "orderType": [
         "文本",
         "图像",
@@ -41,7 +41,7 @@
         "5"
     ],
     "orderExt": [],
-    "xyLabels": [],
+    "doLabels": [],
     "actionBtnColors": {},
     "wsColors": {},
     "theme": "dark",

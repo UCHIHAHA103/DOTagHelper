@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XYplorerTagHelper 使用指南</title>
+    <title>DOTagHelper 使用指南</title>
     <style>
         :root {
             --bg-color: #f5f5f7;
@@ -304,15 +304,15 @@
     </nav>
 
     <main class="content">
-        <h1>XYplorerTagHelper 使用指南</h1>
+        <h1>DOTagHelper 使用指南</h1>
         
-        <p class="intro-text"><a href="https://github.com/C21H21NO2S/XYplorerTagHelper"><strong>XYplorerTagHelper</strong></a> 表面上是一個在 Github 開源的標籤輔助工具，實際上是一個<strong>全功能的 XYplorer 複合搜尋視覺化建構器 (Visual Search Builder)</strong>。它將複雜的檔案類型、路徑、備註、多重標籤邏輯，轉化為直覺的「點選與拖曳」，並即時編譯為 XYplorer 的進階搜尋語法。</p>
+        <p class="intro-text"><a href="https://github.com/C21H21NO2S/DOTagHelper"><strong>DOTagHelper</strong></a> 表面上是一個在 Github 開源的標籤輔助工具，實際上是一個<strong>全功能的 Directory Opus 複合搜尋視覺化建構器 (Visual Search Builder)</strong>。它將複雜的檔案類型、路徑、備註、多重標籤邏輯，轉化為直覺的「點選與拖曳」，並即時編譯為 Directory Opus 的進階搜尋語法。</p>
 
         <h2 id="sec-1">🏗️ 一、 軟體架構與底層邏輯</h2>
         <ul>
             <li><strong>技術架構：</strong> 採用輕量級 <code>pywebview</code> 架構。前端為純 HTML/CSS/JS 建構的現代 UI（支援平滑的深色/淺色雙主題），後端為 Python。全程無第三方龐大框架依賴，啟動極快，記憶體占用低。</li>
             <li><strong>狀態機邏輯：</strong> 你的每一次點擊（左鍵/右鍵）、輸入、拖曳，都會被存入一個全域狀態樹。引擎會即時解析這個樹，編譯出如 <code>tags:A &amp; !B /types={:Image}</code> 的布林搜尋語法。</li>
-            <li><strong>通訊執行：</strong> 編譯好的語法透過 Python 以命令列形式（<code>/feed="::goto..."</code>）靜默發送給 <code>XYplorer.exe</code> 執行。讀寫標籤功能則透過呼叫內部指令碼與系統剪貼簿實現雙向通訊。</li>
+            <li><strong>通訊執行：</strong> 編譯好的語法透過 Python 以命令列形式（<code>dopusrt /cmd ...</code>）靜默發送給 <code>Directory Opus</code> 執行。讀寫標籤功能則透過 <code>dopusrt /cmd SetAttr META</code> 命令實現雙向通訊。</li>
         </ul>
 
         <hr>
@@ -323,7 +323,7 @@
         <h3 id="sec-2-1">1. 基礎設定</h3>
         <ul>
             <li>點擊介面右上角的 <strong>「⚙️ (齒輪)」</strong> 圖示進入系統設定。</li>
-            <li><strong>XYplorer 路徑：</strong> 必須準確填寫 XYplorer 的路徑（可以是 <code>.exe</code> 檔案路徑或所在資料夾），否則無法傳送搜尋指令。</li>
+            <li><strong>Directory Opus 路徑：</strong> 必須準確填寫 Directory Opus 的安裝路徑（可以是 <code>dopusrt.exe</code> 檔案路徑或所在資料夾），否則無法傳送搜尋指令。</li>
             <li><strong>介面語言與主題：</strong> 支援中/英/繁體及深色/淺色主題無縫切換。</li>
         </ul>
 
@@ -342,17 +342,17 @@
         <hr>
 
         <h2 id="sec-3">🎛️ 三、四大核心動作按鈕 (Top Action Buttons)</h2>
-        <p>位於介面頂部的四個大按鈕是整個工具的「執行引擎」。它們負責將你在下方現代 UI 面板中建構的視覺化狀態，轉化為 XYplorer 能聽懂的真實指令。</p>
+        <p>位於介面頂部的四個大按鈕是整個工具的「執行引擎」。它們負責將你在下方現代 UI 面板中建構的視覺化狀態，轉化為 Directory Opus 能聽懂的真實指令。</p>
 
         <h3 id="sec-3-1">1. <strong>🔍 搜尋 (Search)</strong></h3>
         <ul>
-            <li><strong>功能：</strong> 將面板上所有處於啟用狀態的過濾條件（包含檔案類型、自訂副檔名、路徑、進階複合標籤等）自動編譯成 XYplorer 的進階搜尋語法，並下發執行全碟或指定目錄搜尋。</li>
+            <li><strong>功能：</strong> 將面板上所有處於啟用狀態的過濾條件（包含檔案類型、自訂副檔名、路徑、進階複合標籤等）自動編譯成 Directory Opus 的進階搜尋語法（FILTERDEF），並下發執行全碟或指定目錄搜尋。</li>
             <li><strong>注意事項：</strong> 搜尋邏輯嚴格遵循你在面板上的點擊狀態：左鍵（綠色）代表包含或 OR，右鍵（紅色）代表排除。每次成功執行搜尋後，系統會自動儲存你輸入的路徑、名稱和備註到歷史紀錄下拉選單中。</li>
         </ul>
 
         <h3 id="sec-3-2">2. <strong>🏷️ 上標籤 / 刪標籤 (Tag)</strong></h3>
         <ul>
-            <li><strong>功能：</strong> 批次修改 XYplorer 中目前選中檔案的標籤。<strong>支援在一次點擊中同時完成「新增標籤」和「精準抹除舊標籤」</strong>。</li>
+            <li><strong>功能：</strong> 批次修改 Directory Opus 中目前選中檔案的標籤。<strong>支援在一次點擊中同時完成「新增標籤」和「精準抹除舊標籤」</strong>。</li>
             <li><strong>核心操作邏輯：</strong>
                 <ul>
                     <li><strong>左鍵標示 (藍色🔵)：</strong> 標記為<strong>新增</strong>。該標籤將被寫入選中檔案。</li>
@@ -362,21 +362,21 @@
             <li><strong>注意事項：</strong> 
                 <ul>
                     <li>底層引擎會智慧優先執行「移除」指令，隨後執行「新增」指令。</li>
-                    <li>點擊前，<strong>必須確保 XYplorer 處於作用中視窗狀態，且至少選中了一個檔案</strong>。如果未選中任何檔案，或介面上沒有啟用任何藍色/紅色標籤 (如僅有滑鼠中鍵高亮標示的綠色🟢)，系統會攔截操作並彈出錯誤提示。</li>
+                    <li>點擊前，<strong>必須確保 Directory Opus 處於作用中視窗狀態，且至少選中了一個檔案</strong>。如果未選中任何檔案，或介面上沒有啟用任何藍色/紅色標籤 (如僅有滑鼠中鍵高亮標示的綠色🟢)，系統會攔截操作並彈出錯誤提示。</li>
                 </ul>
             </li>
         </ul>
 
         <h3 id="sec-3-3">3. <strong>📖 讀標籤 (Read)</strong></h3>
         <ul>
-            <li><strong>功能：</strong> 擷取 XYplorer 中目前選中檔案的既有標籤，並在助手面板中自動標示、分類並展開對應的標籤樹階層。</li>
+            <li><strong>功能：</strong> 擷取 Directory Opus 中目前選中檔案的既有標籤，並在助手面板中自動標示、分類並展開對應的標籤樹階層。</li>
             <li><strong>注意事項：</strong> 此功能透過系統剪貼簿做為資料中繼。如果讀取的標籤文字極其龐雜（例如超過 500 個字元或包含多行異常文字），為防止誤觸發大面積錯誤啟用，系統會彈出一個安全確認視窗，供你預覽並手動確認後再寫入 UI。</li>
         </ul>
 
         <h3 id="sec-3-4">4. <strong>🗑️ 清空 (Clear)</strong></h3>
         <ul>
             <li><strong>功能：</strong> 一鍵狀態重設。瞬間清除複合篩選區和標籤樹的所有標示狀態（綠、紅、藍），清空所有文字輸入框，將工作區恢復到初始待命狀態。</li>
-            <li><strong>注意事項：</strong> 此操作僅僅是清空**目前介面的搜尋篩選條件**，絕對不會刪除你的任何群組名稱、標籤設定、工作區歷史資料，更不會影響 XYplorer 裡的真實檔案標籤。</li>
+            <li><strong>注意事項：</strong> 此操作僅僅是清空**目前介面的搜尋篩選條件**，絕對不會刪除你的任何群組名稱、標籤設定、工作區歷史資料，更不會影響 Directory Opus 裡的真實檔案標籤。</li>
         </ul>
 
         <hr>
@@ -395,7 +395,7 @@
         <p>複合區面板高度支援自訂：</p>
         <ul>
             <li><strong>類型與副檔名排序：</strong> 按住「文字」、「影像」等預設類型按鈕，或者你自己新增的自訂副檔名按鈕，<strong>左右拖曳</strong>即可調整它們在介面上的排列順序。</li>
-            <li><strong>標註 (Labels) 排序：</strong> 點擊「同步 XYplorer 標註」抓取設定後，同樣支援左右拖曳來重排標註顏色的順序。</li>
+            <li><strong>標註 (Labels) 排序：</strong> 點擊「同步 Directory Opus 標註」抓取設定後，同樣支援左右拖曳來重排標註顏色的順序。</li>
         </ul>
 
         <h3 id="sec-4-3">3. 自訂副檔名的深度編輯</h3>
@@ -412,7 +412,7 @@
 
         <h3 id="sec-4-4">4. 智慧文字輸入</h3>
         <ul>
-            <li><strong>路徑/名稱/備註：</strong> 支援智慧複合邏輯。在輸入框輸入 <code>A+B,C-D</code>，引擎會自動將其轉換為嚴謹的 XYplorer 語法：<code>(A 且 B) 或 (C 且 非D)</code>。</li>
+            <li><strong>路徑/名稱/備註：</strong> 支援智慧複合邏輯。在輸入框輸入 <code>A+B,C-D</code>，引擎會自動將其轉換為嚴謹的 Directory Opus FILTERDEF 語法：<code>(A 且 B) 或 (C 且 非D)</code>。</li>
         </ul>
 
         <hr>
@@ -469,7 +469,7 @@
 
         <h2 id="sec-6">⚠️ 六、 核心操作注意事項</h2>
         <ol>
-            <li><strong>上標籤的前提：</strong> 使用「上標籤」功能前，請確保 XYplorer 處於作用中狀態，且<strong>至少選中了一個檔案</strong>。如果未選中檔案，XYplorer 將忽略該標籤指令。</li>
+            <li><strong>上標籤的前提：</strong> 使用「上標籤」功能前，請確保 Directory Opus 處於作用中狀態，且<strong>至少選中了一個檔案</strong>。如果未選中檔案，Directory Opus 將忽略該標籤指令。</li>
             <li><strong>讀標籤的剪貼簿限制：</strong> 「讀標籤」功能透過複製檔案的標籤到剪貼簿來實現。如果一次性讀取的檔案極多、標籤極為龐雜（超過 500 字元），軟體為防止誤操作，會彈出「批次確認視窗」，讓你手動確認讀取到的標籤明細後再執行啟用。</li>
             <li><strong>系統資料安全：</strong> 所有的設定和標籤資料均以 <code>.json</code> 格式儲存在軟體目錄的 <code>Data</code> 資料夾下。雖然軟體內建了防連續觸發自動儲存機制，但在進行大規模結構重排（大範圍拖曳、批次重新命名）前，建議在「⚙️ 設定」中使用<strong>「匯出工作區資料」</strong>進行手動備份。</li>
         </ol>
