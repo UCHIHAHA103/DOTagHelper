@@ -5762,8 +5762,6 @@ ageM: <= 7 d = modified last 7 days</div>
 """
 
 if __name__ == '__main__':
-    import tempfile
-    
     write_log("=== DOTagHelper Starting ===", "INFO")
     
     initial_data = json.dumps(load_tags(), ensure_ascii=False)
@@ -5788,43 +5786,17 @@ if __name__ == '__main__':
     curr_ver = WINDOW_TITLE.split(' ')[-1]
     html_str = html_template.replace("/*__INIT_DATA__*/{}", initial_data).replace("/*__INIT_CONFIG__*/{}", initial_config).replace("/*__INIT_VERSION__*/", curr_ver)
     
-    # === 关键修复：将 HTML 写入临时文件并通过 file:// URL 加载 ===
-    # pywebview 使用 NavigateToString 加载内联 HTML 在 PyInstaller 打包后可能出现
-    # WebView2 初始化时序问题导致白屏/LOADING 卡住，改用文件加载最稳定
-    _html_file = os.path.join(DATA_DIR, "_app.html")
-    try:
-        with open(_html_file, "w", encoding="utf-8") as f:
-            f.write(html_str)
-        _html_url = "file:///" + _html_file.replace("\\", "/")
-        write_log(f"HTML written to: {_html_file}", "INFO")
-    except Exception as e:
-        write_log(f"Failed to write HTML file: {e}, falling back to inline html", "ERROR")
-        _html_url = None
-    
-    if _html_url:
-        window = webview.create_window(
-            WINDOW_TITLE, 
-            url=_html_url,
-            js_api=api, 
-            width=w_width, 
-            height=w_height,
-            x=w_x,
-            y=w_y,
-            min_size=(450, 500),
-            background_color=startup_bg_color
-        )
-    else:
-        window = webview.create_window(
-            WINDOW_TITLE, 
-            html=html_str,
-            js_api=api, 
-            width=w_width, 
-            height=w_height,
-            x=w_x,
-            y=w_y,
-            min_size=(450, 500),
-            background_color=startup_bg_color
-        )
+    window = webview.create_window(
+        WINDOW_TITLE, 
+        html=html_str,
+        js_api=api, 
+        width=w_width, 
+        height=w_height,
+        x=w_x,
+        y=w_y,
+        min_size=(450, 500),
+        background_color=startup_bg_color
+    )
     
     def on_shown():
         try:
@@ -5889,13 +5861,6 @@ if __name__ == '__main__':
     write_log("Starting webview...", "INFO")
     webview.start()
     write_log("Webview closed.", "INFO")
-    
-    # 清理临时 HTML 文件
-    try:
-        if os.path.exists(_html_file):
-            os.remove(_html_file)
-    except:
-        pass
 
 
 

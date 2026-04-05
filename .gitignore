@@ -3,3 +3,8 @@ Logs/
 Output/
 __pycache__/
 *.spec
+
+# PyInstaller 构建产物
+dist/
+build/
+DOTagHelper_*.zip
