@@ -31,11 +31,19 @@ jobs:
           pyinstaller --noconfirm --onedir --windowed `
             --name "DOTagHelper" `
             --icon "logo.ico" `
-            --add-data "Data;Data" `
-            --add-data "Docs;Docs" `
-            --add-data "Workspace;Workspace" `
             --add-data "logo.ico;." `
+            --hidden-import "clr_loader" `
+            --hidden-import "pythonnet" `
+            --hidden-import "webview" `
+            --collect-all "webview" `
             DOTagHelper.py
+
+      - name: Copy resource files to dist root
+        run: |
+          # 将资源文件复制到 exe 同级目录（程序的 BASE_DIR 指向 exe 所在目录）
+          Copy-Item -Path "Data" -Destination "dist\DOTagHelper\Data" -Recurse -Force
+          Copy-Item -Path "Docs" -Destination "dist\DOTagHelper\Docs" -Recurse -Force
+          Copy-Item -Path "Workspace" -Destination "dist\DOTagHelper\Workspace" -Recurse -Force
 
       - name: Prepare release archive
         run: |

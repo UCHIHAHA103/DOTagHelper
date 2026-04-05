@@ -1342,6 +1342,9 @@ class Api:
 
     def open_manual(self, lang):
         docs_dir = os.path.join(BASE_DIR, "Docs")
+        # PyInstaller 打包后资源可能在 _internal 子目录中
+        if not os.path.exists(docs_dir) and getattr(sys, 'frozen', False):
+            docs_dir = os.path.join(BASE_DIR, "_internal", "Docs")
         if lang == "zh-TW":
             filename = "manual_zh-TW.html"
         elif lang == "en":
@@ -2858,22 +2861,28 @@ ageM: <= 7 d = modified last 7 days</div>
             if(!configData.orderRating) configData.orderRating = [...defaultRatingOrder];
             
             setTimeout(() => {
-                initColorPicker(); initExpandedState(currentTree(), ""); renderWsBar(); renderActionBtnColors(); initCompModule(); render();
-                initResizeObserver();
-                renderSVGs();
+                try {
+                    initColorPicker(); initExpandedState(currentTree(), ""); renderWsBar(); renderActionBtnColors(); initCompModule(); render();
+                    initResizeObserver();
+                    renderSVGs();
+                    // [新增] 启动软件时恢复别名状态
+                    state.showAlias = !!configData['showAlias_' + configData.currentWs];
+                    document.getElementById('btn-swap-alias').classList.toggle('active-green', state.showAlias);
+                    
+                    // [新增] 启动软件时恢复悬浮提示状态
+                    let initTooltip = configData['enableTooltip_' + configData.currentWs];
+                    state.enableTooltip = initTooltip !== undefined ? !!initTooltip : true;
+                    document.getElementById('btn-toggle-tooltip').classList.toggle('active-green', state.enableTooltip);
+                    
+                    initColorPicker(); initExpandedState(currentTree(), ""); renderWsBar(); renderActionBtnColors(); initCompModule(); render();
+                } catch(e) {
+                    console.error('[DOTagHelper] Init error:', e);
+                    sysLog('Init error: ' + e.message, 'ERROR');
+                }
+                // 无论初始化是否成功，都隐藏 loading 界面
                 document.querySelector('.main-content').classList.add('ready');
                 document.getElementById('app-loader').style.opacity = '0';
                 setTimeout(() => document.getElementById('app-loader').style.display = 'none', 400);
-                // [新增] 启动软件时恢复别名状态
-                state.showAlias = !!configData['showAlias_' + configData.currentWs];
-                document.getElementById('btn-swap-alias').classList.toggle('active-green', state.showAlias);
-                
-                // [新增] 启动软件时恢复悬浮提示状态
-                let initTooltip = configData['enableTooltip_' + configData.currentWs];
-                state.enableTooltip = initTooltip !== undefined ? !!initTooltip : true;
-                document.getElementById('btn-toggle-tooltip').classList.toggle('active-green', state.enableTooltip);
-                
-                initColorPicker(); initExpandedState(currentTree(), ""); renderWsBar(); renderActionBtnColors(); initCompModule(); render();
             }, 50);
             
             window.addEventListener('resize', () => setTimeout(updateWsVisibility, 100));
